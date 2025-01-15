@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cookbook</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class=tree>
+        <span><a class="internallink" href=/>Cookbook</a></span>
+        {% for folder in parent_folders %}
+        <span>/</span> <span><a class="internallink" href={{"../"*(parent_folders|length - loop.index)}}>{{folder}}</a></span>
+        {% endfor %}
+    </div>
+    {% if sub_folders %}
+    <div>
+        <ul class="folderlist linklist">
+            {% for folder in sub_folders %}
+            <li><a class="internallink" href="{{folder|replace(' ', '_')}}/">📁 {{folder}}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% if recipes %}
+    <div>
+        <ul class=linklist>
+            {% for recipe in recipes %}
+            <li><a class="internallink" href="{{recipe}}">🍳 {{recipe}}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+  <footer>
+    <span>Site powered by <a href="https://github.com/gardenrobot/cookbook">Cookbook</a>.</span>
+    <span>Recipe stored in <a href="https://cooklang.org/">CookLang</a> format.</span>
+  </footer>
+</body>
+</html>

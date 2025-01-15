@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="{{css}}">
+</head>
+<body>
+    <div class=tree>
+        <span><a class="internallink" href=/>Cookbook</a></span>
+        {% for folder in parent_folders %}
+        <span>/</span> <span><a class="internallink" href={{"../"*(parent_folders|length - loop.index)}}>{{folder}}</a></span>
+        {% endfor %}
+    </div>
+  <h1>{{title}}</h1>
+    <div class=links>
+        <span title="Printer-friendly view"><a href="./print.html">🖨️</a></span>
+        <span title="Download .cook file"><a href="{{title}}.cook">💾</a></span>
+    </div>
+    {% if image_path %}
+    <div class=images>
+        <details id=recipe-img-tab>
+            <summary>Pics:</summary>
+            <span><img class=recipe-img data-src="/cookbook/{{image_path}}"/></span>
+        </details>
+    </div>
+    {% endif %}
+    {% if metadata %}
+    <div class=metadata>
+        <details>
+            <summary>Metadata:</summary>
+            {% for md in metadata %}
+                <div>{{md}}: {{metadata[md]}}</div>
+            {% endfor %}
+        </details>
+    </div>
+    {% endif %}
+    <div class=ingredients>
+        <h2>Ingredience:</h2>
+        <ul>
+            {% for ingr in ingredients %}
+            <li>{{ingr.name}}{% if ingr.quantity %}, {{ingr.quantity.amount}}{% if ingr.quantity.unit != None %} {{ingr.quantity.unit}} {% endif %}{% endif %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class=steps>
+        <h2>Stepes:</h2>
+        {% for step in steps %}
+        <div>
+            <input type=checkbox class=stepinput>
+            <span class=steptext>{{loop.index}}. {{step}}</span>
+        </div>
+        {% endfor %}
+    </div>
+  <footer>
+    <span>Site powered by <a href="https://github.com/gardenrobot/cookbook">Cookbook</a>.</span>
+    <span>Recipe stored in <a href="https://cooklang.org/">CookLang</a> format.</span>
+  </footer>
+</body>
+<script type="text/javascript">
+    update_checkboxes = function(checkbox) {
+        classname = 'struckthrough'
+        is_checked = checkbox.checked;
+        span = checkbox.parentNode.getElementsByClassName('steptext')[0];
+        if(is_checked)
+            span.classList.add(classname);
+        else
+            span.classList.remove(classname);
+    }
+
+    // logic for checking off steps
+    for (const checkbox of document.getElementsByClassName('stepinput')) {
+        checkbox.addEventListener('click', function(ev) {
+            update_checkboxes(ev.target)
+        }, false);
+        update_checkboxes(checkbox);
+    }
+
+    // logic for image loading
+    document.getElementById('recipe-img-tab').addEventListener('click', function(ev) {
+        for (const image of document.getElementsByClassName('recipe-img')) {
+            image.src = image.getAttribute('data-src');
+        }
+    }, false);
+</script>
+</html>

@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+watchdog = "*"
+jinja2 = "*"
+cooklang = {ref = "ea4dc7d8f48ededa35ec64fd41ba048d62fb2c6a", git = "git+https://github.com/gardenrobot/py-cooklang.git"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"

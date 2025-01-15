@@ -1,0 +1,19 @@
+body {
+    line-height:1.6;
+    font-size:16px;
+    font-family: sans-serif;
+}
+
+.steps div {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+
+
+/* things to hide */
+.stepinput, .cooklang_link, .images, .metadata, .tree, .links, footer {
+    display: none;
+}
