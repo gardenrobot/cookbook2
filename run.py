@@ -1,7 +1,7 @@
 import time
 import logging
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import FileSystemEventHandler, FileSystemEvent
 from threading import Lock
 from jinja2 import Environment, FileSystemLoader
 import os
@@ -19,22 +19,31 @@ jinja_env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
 
 
 def main():
-    # TODO support pics
-
-    # move static files into html dir
-    html_static_path = HTML_PATH + "/static"
-    shutil.rmtree(html_static_path, ignore_errors=True)
-    shutil.copytree("static/", html_static_path)
-
+    # TODO release lock on exception
+    # TODO shut down more cleanly
+    # TODO process whole RECIPE_DIR on startup
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+    logging.info("Starting up")
+
+    logging.info("Copying static folder into html path")
+    html_static_path = HTML_PATH + "/static"
+    shutil.rmtree(html_static_path, ignore_errors=True)
+    shutil.copytree("static/", html_static_path)
+
+    logging.info("Setting up watch of recipe folder")
     event_handler = CookbookEventHandler()
     observer = Observer()
     observer.schedule(event_handler, RECIPE_DIR, recursive=True)
     observer.start()
+
+    logging.info("Processing whole recipe folder")
+    event_handler.on_any_event(FileSystemEvent(RECIPE_DIR))
+
+    logging.info("Waiting...")
     try:
         while True:
             time.sleep(1)
@@ -46,13 +55,16 @@ def main():
 class CookbookEventHandler(FileSystemEventHandler):
     def on_any_event(self, event):
         if event.is_directory:
+            logging.info("Directory changed. Acquiring lock...")
             lock.acquire()
+            logging.info("Lock acquired")
             render_dir(event.src_path)
             lock.release()
         return super().on_any_event(event)
 
 
 def render_dir(path):
+    logging.info("Processing folder %s", path)
     assert path.startswith(RECIPE_DIR)
     rel_path = path[len(RECIPE_DIR) + 1 :]
     parent_folders = split_path(rel_path)
@@ -82,6 +94,7 @@ def render_dir(path):
 
 
 def render_file(path):
+    logging.info("Processing file %s", path)
     assert path.startswith(RECIPE_DIR)
     rel_path = path[len(RECIPE_DIR) + 1 :]
     parent_folders = split_path(rel_path)
