@@ -18,11 +18,11 @@
         <span title="Printer-friendly view"><a href="./print.html">🖨️</a></span>
         <span title="Download .cook file"><a href="{{title}}.cook">💾</a></span>
     </div>
-    {% if image_path %}
+    {% if has_image %}
     <div class=images>
         <details id=recipe-img-tab>
             <summary>Pics:</summary>
-            <span><img class=recipe-img data-src="/cookbook/{{image_path}}"/></span>
+            <span><img class=recipe-img data-src="./img"/></span>
         </details>
     </div>
     {% endif %}

@@ -1,4 +1,3 @@
-import sys
 import time
 import logging
 from watchdog.observers import Observer
@@ -88,7 +87,9 @@ def render_file(path):
         txt = f.read()
         recipe = Recipe.parse(txt)
     highlighted_steps = highlight_steps(recipe.ingredients, recipe.steps)
-    image_path = get_image_path(rel_path)
+
+    image_path = get_image_path(path)
+    has_image = image_path != None
 
     # create a directory with the recipe path (minus the .cook extension)
     html_dir = os.path.join(HTML_PATH, rel_path)[:-5]
@@ -97,41 +98,50 @@ def render_file(path):
     except FileExistsError as e:
         pass
 
-
+    # Save main file
     rendered_index = jinja_env.get_template("recipe.html").render(
         parent_folders=parent_folders,
         ingredients=recipe.ingredients,
         steps=highlighted_steps,
         metadata=recipe.metadata,
         title=title,
-        image_path=image_path,
+        has_image=has_image,
         is_printable=False,
         css="/static/styles.css",
     )
     with open(html_dir+"/index.html", "w") as f:
         f.write(rendered_index)
 
+    # Save printable
     rendered_print = jinja_env.get_template("recipe.html").render(
         parent_folders=parent_folders,
         ingredients=recipe.ingredients,
         steps=highlighted_steps,
         metadata=recipe.metadata,
         title=title,
-        image_path=image_path,
+        has_image=has_image,
         is_printable=False,
         css="/static/printable.css",
     )
     with open(html_dir+"/print.html", "w") as f:
         f.write(rendered_print)
     
+    # Copy .cook
     shutil.copy(path, html_dir)
 
-def get_image_path(rel_path):
-    recipe_path = rel_path[:-5]
-    parts = split_path(recipe_path)
+    # Copy image
+    if image_path:
+        print(image_path)
+        shutil.copy(image_path, html_dir+"/img")
+    
+
+def get_image_path(path):
+    print(path)
+    assert path.endswith(".cook")
     for ext in ["jpg", "png"]:
-        if os.path.isfile(os.path.join(RECIPE_DIR, recipe_path + "." + ext)):
-            return recipe_path + "." + ext
+        fn = path[:-5] + "." + ext
+        if os.path.exists(fn):
+            return fn
     return None
 
 def highlight_steps(ingredients, steps):
