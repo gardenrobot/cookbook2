@@ -42,15 +42,11 @@ class CookbookEventHandler(FileSystemEventHandler):
         return super().on_any_event(event)
     
 def render_dir(path):
-    print(path)
     assert path.startswith(RECIPE_DIR)
     rel_path = path[len(RECIPE_DIR)+1:]
     parent_folders = split_path(rel_path)
     _, sub_folders, files = next(os.walk(path))
     recipes = sorted([f[:-5] for f in files if f.endswith(".cook")])
-    print(parent_folders)
-    print(sub_folders)
-    print(recipes)
     rendered = jinja_env.get_template("folder.html").render(
         parent_folders=parent_folders,
         sub_folders=sub_folders,
@@ -58,7 +54,6 @@ def render_dir(path):
     )
     html_dir = os.path.join(HTML_PATH, rel_path)
     index_path = html_dir+"/index.html"
-    print(index_path)
     try:
         os.makedirs(html_dir)
     except FileExistsError as e:
@@ -75,8 +70,6 @@ def render_dir(path):
             render_file(os.path.join(path, f))
 
 def render_file(path):
-    print("file")
-    print(path)
     assert path.startswith(RECIPE_DIR)
     rel_path = path[len(RECIPE_DIR)+1:]
     parent_folders = split_path(rel_path)
@@ -86,13 +79,9 @@ def render_file(path):
     title = parent_folders[-1]
     with open(path) as f:
         txt = f.read()
-        print(path)
         recipe = Recipe.parse(txt)
     highlighted_steps = highlight_steps(recipe.ingredients, recipe.steps)
     image_path = get_image_path(rel_path)
-
-    print(highlighted_steps)
-    print(recipe.steps)
 
     # create a directory with the recipe path (minus the .cook extension)
     html_dir = os.path.join(HTML_PATH, rel_path)[:-5]
