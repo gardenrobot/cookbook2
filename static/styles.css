@@ -54,6 +54,11 @@ h2 {
     background: #181818;
 }
 
+.ingr-name-inline {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
 .ingr-quantity-inline {
     color: #73648A;
     font-weight: bold;

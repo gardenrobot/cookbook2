@@ -19,6 +19,13 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 jinja_env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
 
 def main():
+    # TODO support pics
+
+    # move static files into html dir
+    html_static_path = HTML_PATH+"/static"
+    shutil.rmtree(html_static_path, ignore_errors=True)
+    shutil.copytree("static/", html_static_path)
+
     logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
@@ -134,24 +141,25 @@ def highlight_steps(ingredients, steps):
         for step_index, step in enumerate(steps):
             if (start_index := step.find(ingr.name)) > -1:
                 end_index = start_index + len(ingr.name)
-                indexes.append((end_index, ingr, step_index))
+                indexes.append((start_index, end_index, ingr, step_index))
 
     # sort the index high to low
     indexes.sort(key=lambda x: -x[0])
 
     # insert highlighting
     hl_steps = steps
-    for index, ingr, step_index in indexes:
+    for start_index, end_index, ingr, step_index in indexes:
         step = hl_steps[step_index]
 
         hl = ""
         if ingr.quantity != None:
+            hl += "<span class=ingr-name-inline>" + ingr.name + "</span>"
             hl += "<span class=ingr-quantity-inline>(" + str(ingr.quantity.amount)
             if ingr.quantity.unit:
                 hl += " " + ingr.quantity.unit
             hl += ")</span>"
 
-        step = step[:index] + hl + step[index:]
+        step = step[:start_index] + hl + step[end_index:]
         hl_steps[step_index] = step
 
     return hl_steps
