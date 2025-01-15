@@ -19,9 +19,7 @@ jinja_env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
 
 
 def main():
-    # TODO release lock on exception
     # TODO shut down more cleanly
-    # TODO process whole RECIPE_DIR on startup
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(message)s",
@@ -65,8 +63,12 @@ class CookbookEventHandler(FileSystemEventHandler):
             logging.info("Directory changed. Acquiring lock...")
             lock.acquire()
             logging.info("Lock acquired")
-            render_dir(event.src_path)
-            lock.release()
+            try:
+                render_dir(event.src_path)
+            except Exception as e:
+                logging.error("Error while processing directory %s", event.src_path, exc_info=e)
+            finally:
+                lock.release()
         return super().on_any_event(event)
 
 
