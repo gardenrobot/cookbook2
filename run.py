@@ -49,9 +49,13 @@ def main():
     try:
         while True:
             time.sleep(1)
-    except KeyboardInterrupt:
+    except Exception as e:
+        print(e)
+        logging.info("Stopping")
         observer.stop()
+    logging.info("Sleep over")
     observer.join()
+    logging.info("Joined")
 
 
 class CookbookEventHandler(FileSystemEventHandler):
