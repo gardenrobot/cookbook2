@@ -17,17 +17,20 @@ RECIPE_DIR = os.getenv("RECIPE_DIR", os.path.join(BASE_DIR, "recipes"))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 jinja_env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
 
+
 def main():
     # TODO support pics
 
     # move static files into html dir
-    html_static_path = HTML_PATH+"/static"
+    html_static_path = HTML_PATH + "/static"
     shutil.rmtree(html_static_path, ignore_errors=True)
     shutil.copytree("static/", html_static_path)
 
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S')
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
     event_handler = CookbookEventHandler()
     observer = Observer()
     observer.schedule(event_handler, RECIPE_DIR, recursive=True)
@@ -39,6 +42,7 @@ def main():
         observer.stop()
     observer.join()
 
+
 class CookbookEventHandler(FileSystemEventHandler):
     def on_any_event(self, event):
         if event.is_directory:
@@ -46,10 +50,11 @@ class CookbookEventHandler(FileSystemEventHandler):
             render_dir(event.src_path)
             lock.release()
         return super().on_any_event(event)
-    
+
+
 def render_dir(path):
     assert path.startswith(RECIPE_DIR)
-    rel_path = path[len(RECIPE_DIR)+1:]
+    rel_path = path[len(RECIPE_DIR) + 1 :]
     parent_folders = split_path(rel_path)
     _, sub_folders, files = next(os.walk(path))
     recipes = sorted([f[:-5] for f in files if f.endswith(".cook")])
@@ -59,14 +64,14 @@ def render_dir(path):
         recipes=recipes,
     )
     html_dir = os.path.join(HTML_PATH, rel_path)
-    index_path = html_dir+"/index.html"
+    index_path = html_dir + "/index.html"
     try:
         os.makedirs(html_dir)
     except FileExistsError as e:
         pass
     with open(index_path, "w") as f:
         f.write(rendered)
-    
+
     # recurse to subfolders
     for sub_folder in sub_folders:
         render_dir(os.path.join(path, sub_folder))
@@ -75,9 +80,10 @@ def render_dir(path):
         if f.endswith(".cook"):
             render_file(os.path.join(path, f))
 
+
 def render_file(path):
     assert path.startswith(RECIPE_DIR)
-    rel_path = path[len(RECIPE_DIR)+1:]
+    rel_path = path[len(RECIPE_DIR) + 1 :]
     parent_folders = split_path(rel_path)
     # remove .cook ext from parent_folder's item
     parent_folders[-1] = parent_folders[-1][:-5]
@@ -109,7 +115,7 @@ def render_file(path):
         is_printable=False,
         css="/static/styles.css",
     )
-    with open(html_dir+"/index.html", "w") as f:
+    with open(html_dir + "/index.html", "w") as f:
         f.write(rendered_index)
 
     # Save printable
@@ -123,17 +129,17 @@ def render_file(path):
         is_printable=False,
         css="/static/printable.css",
     )
-    with open(html_dir+"/print.html", "w") as f:
+    with open(html_dir + "/print.html", "w") as f:
         f.write(rendered_print)
-    
+
     # Copy .cook
     shutil.copy(path, html_dir)
 
     # Copy image
     if image_path:
         print(image_path)
-        shutil.copy(image_path, html_dir+"/img")
-    
+        shutil.copy(image_path, html_dir + "/img")
+
 
 def get_image_path(path):
     print(path)
@@ -143,6 +149,7 @@ def get_image_path(path):
         if os.path.exists(fn):
             return fn
     return None
+
 
 def highlight_steps(ingredients, steps):
     # find indexes to insert highlighting
@@ -174,6 +181,7 @@ def highlight_steps(ingredients, steps):
 
     return hl_steps
 
+
 def split_path(path):
     """
     Takes a path under the RECIPE_DIR and returns the list of folders from the RECIPE_DIR to it.
@@ -187,6 +195,7 @@ def split_path(path):
     if (head := headtail[0]) == "/":
         parts.insert(0, head)
     return parts
+
 
 if __name__ == "__main__":
     main()
