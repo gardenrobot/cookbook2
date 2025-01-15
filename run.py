@@ -41,7 +41,9 @@ def main():
     observer.start()
 
     logging.info("Processing whole recipe folder")
-    event_handler.on_any_event(FileSystemEvent(RECIPE_DIR))
+    event = FileSystemEvent(RECIPE_DIR)
+    event.is_directory = True
+    event_handler.on_any_event(event)
 
     logging.info("Waiting...")
     try:
@@ -54,6 +56,7 @@ def main():
 
 class CookbookEventHandler(FileSystemEventHandler):
     def on_any_event(self, event):
+        print(event.src_path)
         if event.is_directory:
             logging.info("Directory changed. Acquiring lock...")
             lock.acquire()
