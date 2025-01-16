@@ -81,6 +81,7 @@ def render_dir(path):
 
     parent_folders = split_path(rel_path)
     _, sub_folders, files = next(os.walk(path))
+    sub_folders.sort()
     recipes = sorted([f[:-5] for f in files if f.endswith(".cook")])
     rendered = jinja_env.get_template("folder.html").render(
         parent_folders=parent_folders,
