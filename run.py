@@ -74,6 +74,11 @@ def render_dir(path):
     logging.info("Processing folder %s", path)
     assert path.startswith(RECIPE_DIR)
     rel_path = path[len(RECIPE_DIR) + 1 :]
+    html_dir = os.path.join(HTML_PATH, rel_path)
+
+    logging.info("Deleting old folder %s", html_dir)
+    shutil.rmtree(html_dir, ignore_errors=True)
+
     parent_folders = split_path(rel_path)
     _, sub_folders, files = next(os.walk(path))
     recipes = sorted([f[:-5] for f in files if f.endswith(".cook")])
@@ -82,7 +87,6 @@ def render_dir(path):
         sub_folders=sub_folders,
         recipes=recipes,
     )
-    html_dir = os.path.join(HTML_PATH, rel_path)
     index_path = html_dir + "/index.html"
     try:
         os.makedirs(html_dir)
