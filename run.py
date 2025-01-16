@@ -48,8 +48,7 @@ def main():
         while True:
             time.sleep(1)
     except Exception as e:
-        print(e)
-        logging.info("Stopping")
+        logging.error("Exception while sleeping", exc_info=e)
         observer.stop()
     logging.info("Sleep over")
     observer.join()
@@ -58,7 +57,6 @@ def main():
 
 class CookbookEventHandler(FileSystemEventHandler):
     def on_any_event(self, event):
-        print(event.src_path)
         if event.is_directory:
             logging.info("Directory changed. Acquiring lock...")
             lock.acquire()
@@ -159,12 +157,10 @@ def render_file(path):
 
     # Copy image
     if image_path:
-        print(image_path)
         shutil.copy(image_path, html_dir + "/img")
 
 
 def get_image_path(path):
-    print(path)
     assert path.endswith(".cook")
     for ext in ["jpg", "png"]:
         fn = path[:-5] + "." + ext
