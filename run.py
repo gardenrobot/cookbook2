@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 import os
 from cooklang import Recipe
 import shutil
+import glob
 
 
 lock = Lock()
@@ -76,9 +77,10 @@ def render_dir(path):
     rel_path = path[len(RECIPE_DIR) + 1 :]
     html_dir = os.path.join(HTML_PATH, rel_path)
 
-    logging.info("Deleting old folder %s", html_dir)
-    shutil.rmtree(html_dir, ignore_errors=True)
+    logging.info("Deleting contents of old folder %s", html_dir)
+    [shutil.rmtree(x, ignore_errors=True) for x in glob.glob(html_dir+'/*') if not x.endswith("/static")]
 
+    logging.info("Rendering html")
     parent_folders = split_path(rel_path)
     _, sub_folders, files = next(os.walk(path))
     sub_folders.sort()
@@ -96,6 +98,7 @@ def render_dir(path):
     with open(index_path, "w") as f:
         f.write(rendered)
 
+    logging.info("Rendering done. Recursing...")
     # recurse to subfolders
     for sub_folder in sub_folders:
         render_dir(os.path.join(path, sub_folder))
