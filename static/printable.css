@@ -11,6 +11,16 @@ body {
     padding-right: 5px;
 }
 
+.ingr-name-inline {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.ingr-quantity-inline {
+    font-weight: bold;
+    color: blueviolet;
+}
+
 
 
 /* things to hide */
