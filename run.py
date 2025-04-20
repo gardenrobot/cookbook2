@@ -65,7 +65,9 @@ class CookbookEventHandler(FileSystemEventHandler):
             try:
                 render_dir(event.src_path)
             except Exception as e:
-                logging.error("Error while processing directory %s", event.src_path, exc_info=e)
+                logging.error(
+                    "Error while processing directory %s", event.src_path, exc_info=e
+                )
             finally:
                 lock.release()
         return super().on_any_event(event)
@@ -78,7 +80,11 @@ def render_dir(path):
     html_dir = os.path.join(HTML_PATH, rel_path)
 
     logging.info("Deleting contents of old folder %s", html_dir)
-    [shutil.rmtree(x, ignore_errors=True) for x in glob.glob(html_dir+'/*') if not x.endswith("/static")]
+    [
+        shutil.rmtree(x, ignore_errors=True)
+        for x in glob.glob(html_dir + "/*")
+        if not x.endswith("/static")
+    ]
 
     logging.info("Rendering html")
     parent_folders = split_path(rel_path)
@@ -178,33 +184,29 @@ def get_image_path(path):
 
 
 def highlight_steps(ingredients, steps):
-    # find indexes to insert highlighting
-    indexes = []
-    for ingr in ingredients:
-        for step_index, step in enumerate(steps):
-            if (start_index := step.find(ingr.name)) > -1:
-                end_index = start_index + len(ingr.name)
-                indexes.append((start_index, end_index, ingr, step_index))
+    """Takes ingredients and steps and returns modified steps that have html tags surrounding each ingredient"""
+    pre_name = "<span class=ingr-name-inline>"
+    post_name = "</span>"
+    pre_quantity = "<span class=ingr-quantity-inline>("
+    post_quantity = ")</span>"
 
-    # sort the index high to low
-    indexes.sort(key=lambda x: -x[0])
-
-    # insert highlighting
     hl_steps = steps
-    for start_index, end_index, ingr, step_index in indexes:
-        step = hl_steps[step_index]
+    for ingr in reversed(sorted(ingredients, key=lambda x: x.location)):
+        step_index = ingr.location[0]
+        old_step = hl_steps[step_index]
 
-        hl = ""
-        if ingr.quantity != None:
-            hl += "<span class=ingr-name-inline>" + ingr.name + "</span>"
-            hl += "<span class=ingr-quantity-inline>(" + str(ingr.quantity.amount)
+        start_index = ingr.location[1]
+        end_index = ingr.location[2]
+        new_step = old_step[0:start_index] + "TODO" + old_step[end_index:]
+        quantity_str = ""
+        if ingr.quantity:
+            quantity_str += f"{pre_quantity}{ingr.quantity.amount}"
             if ingr.quantity.unit:
-                hl += " " + ingr.quantity.unit
-            hl += ")</span>"
+                quantity_str += f" {ingr.quantity.unit}"
+            quantity_str += post_quantity
+        new_step = f"{old_step[0:start_index]}{pre_name}{ingr.name}{post_name}{quantity_str}{old_step[end_index:]}"
 
-        step = step[:start_index] + hl + step[end_index:]
-        hl_steps[step_index] = step
-
+        hl_steps[step_index] = new_step
     return hl_steps
 
 
