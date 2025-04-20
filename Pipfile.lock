@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8c8dda04f7055cad990e50bbab3d4df12d2730a741e2c09bad6cfa89c16019e6"
+            "sha256": "252352935172646673de08118114726b479f041af0b18889480d1449902f063d"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.12"
+            "python_version": "3.10"
         },
         "sources": [
             {
@@ -17,17 +17,16 @@
     },
     "default": {
         "cooklang": {
-            "git": "git+https://github.com/gardenrobot/py-cooklang.git",
-            "ref": "ea4dc7d8f48ededa35ec64fd41ba048d62fb2c6a"
+            "git": "https://github.com/gardenrobot/py-cooklang.git",
+            "ref": "28274b6d62f5c32a32282232aead4ae10f8d0350"
         },
         "jinja2": {
             "hashes": [
-                "sha256:8fefff8dc3034e27bb80d67c671eb8a9bc424c0ef4c0826edbff304cceff43bb",
-                "sha256:aba0f4dc9ed8013c424088f68a5c226f7d6097ed89b246d7749c2ec4175c6adb"
+                "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d",
+                "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.7'",
-            "version": "==3.1.5"
+            "version": "==3.1.6"
         },
         "markupsafe": {
             "hashes": [
@@ -130,7 +129,6 @@
                 "sha256:ef810fbf7b781a5a593894e4f439773830bdecb885e6880d957d5b9382a960d2"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.9'",
             "version": "==6.0.0"
         }
     },
